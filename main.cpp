@@ -114,16 +114,23 @@ bool Game::canChangeEnemy(int row, int col)
 
 void Game::printBoard()
 {
+    cout << "   a b c d e f g h " << endl
+    << "   ----------------" << endl;
+
     for (int i = 1; i < 9; i++)
     {
         for (int j = 1; j < 9; j++)
         {
-            cout << convertToPiece(this->board[i][j]);
+            if (j == 1)
+                cout << i << "|";
+            cout << " " + convertToPiece(this->board[i][j]);
             // cout << this->pieces[i][j];
             if (j == 8)
-                cout << endl;
+                cout << " |" << endl;
         }
     }
+
+    cout << "   ----------------" << endl;
 }
 
 int main()
