@@ -14,26 +14,32 @@ string convertToPiece(int i)
         return "□";
 }
 
+int whoIsEnemyOf(int i)
+{
+    return i * (-1);
+}
+
 class Game
 {
 private:
     int board[10][10] = {{9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
-                          {9, 0, 0, 0, 0, 0, 0, 0, 0, 9},
-                          {9, 0, 0, 0, 0, 0, 0, 0, 0, 9},
-                          {9, 0, 0, 0, 0, 0, 0, 0, 0, 9},
-                          {9, 0, 0, 0, -1, 1, 0, 0, 0, 9},
-                          {9, 0, 0, 0, 1, -1, 0, 0, 0, 9},
-                          {9, 0, 0, 0, 0, 0, 0, 0, 0, 9},
-                          {9, 0, 0, 0, 0, 0, 0, 0, 0, 9},
-                          {9, 0, 0, 0, 0, 0, 0, 0, 0, 9},
-                          {9, 9, 9, 9, 9, 9, 9, 9, 9, 9}};
+                         {9, 0, 0, 0, 0, 0, 0, 0, 0, 9},
+                         {9, 0, 0, 0, 0, 0, 0, 0, 0, 9},
+                         {9, 0, 0, 0, 0, 0, 0, 0, 0, 9},
+                         {9, 0, 0, 0, -1, 1, 0, 0, 0, 9},
+                         {9, 0, 0, 0, 1, -1, 0, 0, 0, 9},
+                         {9, 0, 0, 0, 0, 0, 0, 0, 0, 9},
+                         {9, 0, 0, 0, 0, 0, 0, 0, 0, 9},
+                         {9, 0, 0, 0, 0, 0, 0, 0, 0, 9},
+                         {9, 9, 9, 9, 9, 9, 9, 9, 9, 9}};
 
     string player1 = "Player 1";
     string player2 = "Player 2";
-    int turn = 1; // 1 = player 1, -1 = player 2
+    int turn; // 1 = player 1, -1 = player 2
 public:
     void printMovePrompt();
-    void setPiece(int row, int col);
+    void getMove();
+    void makeMove(int row, int col);
     void evalBoard();
     void changeTurn();
     void printBoard();
@@ -42,80 +48,158 @@ public:
     bool isMoveLegal(int row, int col);
     bool haveNeighbor(int row, int col);
     bool canChangeEnemy(int row, int col);
+    int countTurnablePieces(int row, int col, int x, int y);
+    int getBoardValue(int row, int col);
 
     Game();
 };
 
 Game::Game()
 {
+    this->turn = 1;
 }
 
-void Game::setPiece(int row, int col)
+void Game::makeMove(int row, int col)
 {
     if (isMoveLegal(row, col))
     {
-        this->board[row][col] = turn;
+        for (int d = -1; d <= 1; d++)
+        {
+            for (int e = -1; e <= 1; e++)
+            {
+                if (d == 0 && e == 0)
+                    continue;
+                else
+                {
+                    int count = this->countTurnablePieces(row, col, d, e);
+                    cout << "Called" << endl;
+                    if (count > 0)
+                    {
+                        for (int i = 0; i <= count; i++)
+                        {
+                            this->board[row + i * d][col + i * e] = this->turn;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    this->changeTurn();
+}
+
+void Game::changeTurn()
+{
+    cout << "Turn is " << this->turn << endl;
+    this->turn = this->turn * (-1);
+    cout << "Turn is " << this->turn << endl;
+}
+
+void Game::printMovePrompt()
+{
+    string player = this->turn > 0 ? "Player 1" : "Player 2";
+    cout << "It is now " << player << "'s turn" << endl
+         << "Please input your move. ex) d 4" << endl
+         << "> ";
+}
+
+void Game::getMove()
+{
+    char a;
+    int b = 0;
+    this->printMovePrompt();
+    cin >> a >> b;
+    int ia = a - 96;
+    cout << "Hi ia: " << ia << " b : " << b << endl;
+    if (this->isMoveLegal(ia, b))
+    {
+        cout << "What is" << endl;
+        this->makeMove(b, ia);
+        cout << "Wrong" << endl;
+        cout << "With" << endl;
+        this->printBoard();
+        cout << "This function" << endl;
+        this->getMove();
+    }
+    else
+    {
+        cout << "Ilegal or invalid input. Please try again." << endl;
+        this->getMove();
     }
 }
 
 bool Game::isMoveLegal(int row, int col)
 {
+    cout << "Hello" << endl;
     if (this->board[row][col] != 0)
+    {
+        cout << "Woo" << endl;
         return false;
+    }
     else if (!(this->haveNeighbor(row, col)))
+    {
+        cout << "What is" << endl;
         return false;
-    //else if ()
+    }
+    else if (!this->canChangeEnemy(row, col))
+    {
+        cout << "Happening" << endl;
+        return false;
+    }
+
+    return true;
 }
 
 bool Game::haveNeighbor(int row, int col)
 {
-    return (this->board[row - 1][col - 1] != 0 && this->board[row - 1][col - 1] != 9 
-                && this->board[row - 1][col] != 0 && this->board[row - 1][col] != 9
-                && this->board[row - 1][col + 1] != 0 && this->board[row - 1][col + 1] != 9 
-                && this->board[row][col - 1] != 0 && this->board[row][col - 1] != 9
-                && this->board[row][col + 1] != 0 && this->board[row][col + 1] != 0 
-                && this->board[row + 1][col - 1] != 0 && this->board[row + 1][col - 1] != 9 
-                && this->board[row + 1][col] != 0 && this->board[row + 1][col] != 9 
-                && this->board[row + 1][col + 1] != 0 && this->board[row + 1][col + 1] != 0);
+    return (this->board[row - 1][col - 1] != 0 || this->board[row - 1][col - 1] != 9 || this->board[row - 1][col] != 0 || this->board[row - 1][col] != 9 || this->board[row - 1][col + 1] != 0 || this->board[row - 1][col + 1] != 9 || this->board[row][col - 1] != 0 || this->board[row][col - 1] != 9 || this->board[row][col + 1] != 0 || this->board[row][col + 1] != 0 || this->board[row + 1][col - 1] != 0 || this->board[row + 1][col - 1] != 9 || this->board[row + 1][col] != 0 || this->board[row + 1][col] != 9 || this->board[row + 1][col + 1] != 0 || this->board[row + 1][col + 1] != 0);
 }
 
 bool Game::canChangeEnemy(int row, int col)
 {
-    if ((row > 0 && col > 0 && row < 7 && col < 7))
+    for (int d = -1; d <= 1; d++)
     {
-        return !(this->board[row - 1][col - 1] == 0 && this->board[row - 1][col] == 0 && this->board[row - 1][col + 1] == 0 && this->board[row][col - 1] == 0 && this->board[row][col + 1] == 0 && this->board[row + 1][col - 1] == 0 && this->board[row + 1][col] == 0 && this->board[row + 1][col + 1] == 0);
-    }
-    else
-    {
-        if ((row - col) == 0 || abs(row - col) == 7)
+        for (int e = -1; e <= 1; e++)
         {
-            if (row == 0 && col == 0)
-                return !(this->board[row][col + 1] == 0 && this->board[row + 1][col + 1] == 0 && this->board[row + 1][col] == 0);
-            else if (row == 7 && col == 7)
-                return !(this->board[row][col - 1] == 0 && this->board[row - 1][col - 1] == 0 && this->board[row - 1][col] == 0);
-            else if (row == 0 && col == 7)
-                return !(this->board[row][col - 1] == 0 && this->board[row + 1][col - 1] == 0 && this->board[row + 1][col] == 0);
-            else if (row == 7 && col == 0)
-                return !(this->board[row - 1][col] == 0 && this->board[row + 1][col - 1] == 0 && this->board[row][col + 1] == 0);
-        }
-        else
-        {
-            if (row == 0)
-                return !(this->board[row][col - 1] == 0 && this->board[row][col + 1] == 0 && this->board[row + 1][col - 1] == 0 && this->board[row + 1][col] == 0 && this->board[row + 1][col + 1] == 0);
-            else if (col == 0)
-                return !(this->board[row - 1][col] == 0 && this->board[row + 1][col] == 0 && this->board[row + 1][col + 1] == 0 && this->board[row - 1][col + 1] == 0 && this->board[row][col + 1] == 0);
-            else if (row == 7)
-                return !(this->board[row][col - 1] == 0 && this->board[row][col + 1] == 0 && this->board[row - 1][col - 1] == 0 && this->board[row - 1][col] == 0 && this->board[row - 1][col + 1] == 0);
-            else if (col == 7)
-                return !(this->board[row - 1][col] == 0 && this->board[row + 1][col] == 0 && this->board[row - 1][col - 1] == 0 && this->board[row][col - 1] == 0 && this->board[row + 1][col - 1] == 0);
+            if (d == 0 && e == 0)
+                continue;
+            cout << "Check row: " << row << " col: " << col << " d: " << d << " e: " << e << endl;
+            if (this->countTurnablePieces(row, col, d, e) > 0)
+                return true;
+            else
+                continue;
         }
     }
+    return false;
 }
+
+int Game::countTurnablePieces(int row, int col, int x, int y)
+{
+    int count = 0;
+    for (int i = 1; i < 9; i++)
+    {
+        if (this->board[row + i * x][col + i * y] == whoIsEnemyOf(this->turn))
+        {
+            cout << "Hello 1 Checking: " << row + i * x << " and " << col + i * y << endl;
+            count++;
+        }
+        else if (this->board[row + i * x][col + i * y] == this->turn && count > 0)
+        {
+            cout << "Hello 2 Checking: " << row + i * x << " and " << col + i * y << endl;
+            return count;
+        }
+        else if (this->board[row + i * x][col + i * y] == 0 || this->board[row + i * x][col + i * y] == 9)
+        {
+            cout << "Hello 3 Checking: " << row + i * x << " and " << col + i * y << endl;
+            return 0;
+        }
+    }
+};
 
 void Game::printBoard()
 {
     cout << "   a b c d e f g h " << endl
-    << "   ----------------" << endl;
+         << "   ----------------" << endl;
 
     for (int i = 1; i < 9; i++)
     {
@@ -124,7 +208,6 @@ void Game::printBoard()
             if (j == 1)
                 cout << i << "|";
             cout << " " + convertToPiece(this->board[i][j]);
-            // cout << this->pieces[i][j];
             if (j == 8)
                 cout << " |" << endl;
         }
@@ -137,5 +220,6 @@ int main()
 {
     Game game = Game();
     game.printBoard();
+    game.getMove();
     return 0;
 }
