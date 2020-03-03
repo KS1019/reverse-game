@@ -35,7 +35,7 @@ private:
 
     string player1 = "Player 1（●）";
     string player2 = "Player 2（○）";
-    int turn; // 1 = player 1, -1 = player 2
+    int turn = 1; // 1 = player 1, -1 = player 2
 public:
     void printMovePrompt();
     void getMove();
@@ -54,11 +54,6 @@ public:
 
     Game();
 };
-
-Game::Game()
-{
-    this->turn = 1;
-}
 
 void Game::makeMove(int row, int col)
 {
