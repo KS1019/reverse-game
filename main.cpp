@@ -11,7 +11,7 @@ string convertToPiece(int i)
     else if (i == -1)
         return "○";
     else
-        return "□";
+        return " ";
 }
 
 int whoIsEnemyOf(int i)
@@ -33,8 +33,8 @@ private:
                          {9, 0, 0, 0, 0, 0, 0, 0, 0, 9},
                          {9, 9, 9, 9, 9, 9, 9, 9, 9, 9}};
 
-    string player1 = "Player 1";
-    string player2 = "Player 2";
+    string player1 = "Player 1（●）";
+    string player2 = "Player 2（○）";
     int turn; // 1 = player 1, -1 = player 2
 public:
     void printMovePrompt();
@@ -72,7 +72,6 @@ void Game::makeMove(int row, int col)
                 else
                 {
                     int count = this->countTurnablePieces(row, col, d, e);
-                    cout << "Called" << endl;
                     if (count > 0)
                     {
                         for (int i = 0; i <= count; i++)
@@ -90,14 +89,12 @@ void Game::makeMove(int row, int col)
 
 void Game::changeTurn()
 {
-    cout << "Turn is " << this->turn << endl;
     this->turn = this->turn * (-1);
-    cout << "Turn is " << this->turn << endl;
 }
 
 void Game::printMovePrompt()
 {
-    string player = this->turn > 0 ? "Player 1" : "Player 2";
+    string player = this->turn > 0 ? this->player1 : this->player2;
     cout << "It is now " << player << "'s turn" << endl
          << "Please input your move. ex) d 4" << endl
          << "> ";
@@ -110,15 +107,10 @@ void Game::getMove()
     this->printMovePrompt();
     cin >> a >> b;
     int ia = a - 96;
-    cout << "Hi ia: " << ia << " b : " << b << endl;
-    if (this->isMoveLegal(ia, b))
+    if (this->isMoveLegal(b, ia))
     {
-        cout << "What is" << endl;
         this->makeMove(b, ia);
-        cout << "Wrong" << endl;
-        cout << "With" << endl;
         this->printBoard();
-        cout << "This function" << endl;
         this->getMove();
     }
     else
@@ -130,20 +122,16 @@ void Game::getMove()
 
 bool Game::isMoveLegal(int row, int col)
 {
-    cout << "Hello" << endl;
     if (this->board[row][col] != 0)
     {
-        cout << "Woo" << endl;
         return false;
     }
     else if (!(this->haveNeighbor(row, col)))
     {
-        cout << "What is" << endl;
         return false;
     }
     else if (!this->canChangeEnemy(row, col))
     {
-        cout << "Happening" << endl;
         return false;
     }
 
@@ -163,11 +151,13 @@ bool Game::canChangeEnemy(int row, int col)
         {
             if (d == 0 && e == 0)
                 continue;
-            cout << "Check row: " << row << " col: " << col << " d: " << d << " e: " << e << endl;
-            if (this->countTurnablePieces(row, col, d, e) > 0)
-                return true;
             else
-                continue;
+            {
+                if (this->countTurnablePieces(row, col, d, e) > 0)
+                    return true;
+                else
+                    continue;
+            }
         }
     }
     return false;
@@ -180,17 +170,14 @@ int Game::countTurnablePieces(int row, int col, int x, int y)
     {
         if (this->board[row + i * x][col + i * y] == whoIsEnemyOf(this->turn))
         {
-            cout << "Hello 1 Checking: " << row + i * x << " and " << col + i * y << endl;
             count++;
         }
         else if (this->board[row + i * x][col + i * y] == this->turn && count > 0)
         {
-            cout << "Hello 2 Checking: " << row + i * x << " and " << col + i * y << endl;
             return count;
         }
         else if (this->board[row + i * x][col + i * y] == 0 || this->board[row + i * x][col + i * y] == 9)
         {
-            cout << "Hello 3 Checking: " << row + i * x << " and " << col + i * y << endl;
             return 0;
         }
     }
