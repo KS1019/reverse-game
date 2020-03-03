@@ -36,6 +36,7 @@ private:
     string player1 = "Player 1（●）";
     string player2 = "Player 2（○）";
     int turn = 1; // 1 = player 1, -1 = player 2
+    int noLegalMoveCount = 0;
 public:
     void printMovePrompt();
     void getMove();
@@ -44,6 +45,7 @@ public:
     void changeTurn();
     void printBoard();
     void printPrompt();
+    void findAllLegalMoves();
     bool isGameFinished();
     bool isMoveLegal(int row, int col);
     bool haveNeighbor(int row, int col);
