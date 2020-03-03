@@ -53,8 +53,6 @@ public:
     int countTurnablePieces(int row, int col, int x, int y);
     int getBoardValue(int row, int col);
     int getEnemy();
-
-    Game();
 };
 
 void Game::makeMove(int row, int col)

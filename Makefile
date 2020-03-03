@@ -1,7 +1,7 @@
-reverse-game:
+reversi-game:
 	g++ -o result main.cpp
 
-run: reverse-game
+run: reversi-game
 	./result
 
 clean:
